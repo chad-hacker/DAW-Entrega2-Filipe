@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
+require("reflect-metadata");
+const typeorm_1 = require("typeorm");
+const rotas_usu_rio_1 = __importDefault(require("./rotas/rotas-usu\u00E1rio"));
+const rotas_professor_1 = __importDefault(require("./rotas/rotas-professor"));
+const app = (0, express_1.default)();
+const PORT = process.env.PORT || 3333;
+const CORS_ORIGIN = process.env.CORS_ORIGIN;
+app.use((0, cors_1.default)({ origin: CORS_ORIGIN }));
+app.use(express_1.default.json());
+app.use("/usuarios", rotas_usu_rio_1.default);
+app.use("/professores", rotas_professor_1.default);
+app.listen(PORT);
+const conexão = (0, typeorm_1.createConnection)();
+exports.default = conexão;
