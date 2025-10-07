@@ -1,80 +1,70 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from 'react'
+import { api } from '../api/api'
 
-export default function Login() {
-  const [nome_login, setNomeLogin] = useState("");
-  const [senha, setSenha] = useState("");
-  const [mensagem, setMensagem] = useState("");
+export default function LoginPage() {
+  const [nome_login, setNomeLogin] = useState('')
+  const [senha, setSenha] = useState('')
+  const [resposta, setResposta] = useState<any>(null)
+  const [erro, setErro] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setErro(null)
+    setResposta(null)
+    setLoading(true)
     try {
-      // Envia login e senha para o backend
-      const response = await axios.post("http://localhost:3333/usuario/login", {
+      const { data } = await api.post('/usuarios/login', {
         nome_login,
-        senha,
-      });
-
-      // Caso dê certo, salva o token no localStorage
-      const token = response.data.usuarioLogado.token;
-      localStorage.setItem("token", token);
-
-      // Mensagem de sucesso
-      setMensagem("✅ Login realizado com sucesso!");
-      console.log("Usuário logado:", response.data.usuarioLogado);
-
-      // Redireciona para a página inicial
-      window.location.href = "/home";
-
-    } catch (error: any) {
-      console.error(error);
-      if (error.response) {
-        setMensagem(`❌ Erro: ${error.response.data.erro}`);
-      } else {
-        setMensagem("❌ Erro ao conectar com o servidor.");
-      }
+        senha
+      })
+      setResposta(data)
+    } catch (err: any) {
+      setErro(err?.response?.data?.erro || 'Falha no login')
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div style={{ textAlign: "center", marginTop: "80px" }}>
+    <div style={{ maxWidth: 420 }}>
       <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 12 }}>
+        <label>
+          Usuário:
           <input
             type="text"
-            placeholder="CPF ou Nome de Usuário"
             value={nome_login}
             onChange={(e) => setNomeLogin(e.target.value)}
-            style={{ margin: "10px", padding: "8px" }}
+            placeholder="Digite seu usuário"
           />
-        </div>
-        <div>
+        </label>
+
+        <label>
+          Senha:
           <input
             type="password"
-            placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            style={{ margin: "10px", padding: "8px" }}
+            placeholder="******"
           />
-        </div>
-        <button
-          type="submit"
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#007bff",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Entrar
+        </label>
+
+        <button disabled={loading} type="submit">
+          {loading ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
 
-      {mensagem && <p style={{ marginTop: "20px" }}>{mensagem}</p>}
+      {erro && <p style={{ color: 'crimson' }}>Erro: {erro}</p>}
+
+      {resposta && (
+        <>
+          <h3>Resposta da API</h3>
+          <pre style={{ background: '#111', color: '#0f0', padding: 12 }}>
+            {JSON.stringify(resposta, null, 2)}
+          </pre>
+        </>
+      )}
     </div>
-  );
+  )
 }

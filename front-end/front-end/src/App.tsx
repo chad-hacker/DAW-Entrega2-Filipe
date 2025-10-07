@@ -1,21 +1,23 @@
-import { Routes, Route, Link } from "react-router-dom";
-import Login from "./pages/Login";
-import Cadastro from "./pages/Cadastro";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import CadastroPage from "./pages/CadastroPage";
 
 export default function App() {
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Portal DAW</h1>
-      <nav>
-        <Link to="/login">Login</Link> |{" "}
-        <Link to="/cadastro">Cadastro</Link>
-      </nav>
+    <BrowserRouter>
+      <div style={{ fontFamily: "system-ui, sans-serif", padding: 24 }}>
+        <nav style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+          <Link to="/login">Login</Link>
+          <Link to="/cadastro">Cadastro</Link>
+        </nav>
 
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="*" element={<h2>Página não encontrada</h2>} />
-      </Routes>
-    </div>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/cadastro" element={<CadastroPage />} />
+          <Route path="*" element={<div>Página não encontrada.</div>} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
